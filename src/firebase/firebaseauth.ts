@@ -117,6 +117,7 @@ export const forgetPassword = (email: string, setError:(error: string) => void) 
     })
     .catch((error) => {
       setError("Error occured during the proccess");
+      console.error("error occured => ", error.code);
       // const errorCode = error.code;
       // const errorMessage = error.message;
       // ..
@@ -157,6 +158,7 @@ export function SinginWithGoogle(router: AppRouterInstance, setError:(error: str
     setError("");
   }).catch((error) => {
     setError("Error occured during the proccess");
+    console.error("error occured => ", error.code);
     // // Handle Errors here.
     // const errorCode = error.code;
     // const errorMessage = error.message;
@@ -183,8 +185,3 @@ async function createUser(docRef: DocumentReference, user:User) {
     isVerified: user.emailVerified,
   })
 }
-
-
-
-
-

@@ -394,7 +394,7 @@ export const shape = {
   borderRadius: 8,
 };
 
-// @ts-expect-error
+// @ts-expect-error: customizing Material UI shadow array, length may differ
 const defaultShadows: Shadows = [
   'none',
   'var(--template-palette-baseShadow)',
