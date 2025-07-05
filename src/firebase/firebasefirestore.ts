@@ -1,9 +1,8 @@
 "use client";
 
-import { addDoc, collection, doc, DocumentData, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
 import { app } from "./firebaseconfig";
 import { auth } from "./firebaseauth";
-import { AuthContextData } from "@/context/authcontext";
 
 type UserType = {
   username: string,
@@ -18,7 +17,7 @@ export async function saveUser(User: UserType) {
   try {
     // let docRef = doc(db, "collectionName", "docId")
     // await setDoc("where", "what");
-    let docRef = doc(db, "Users", User.uid);
+    const docRef = doc(db, "Users", User.uid);
 
     await setDoc(docRef, User);
     console.log("User saved successfully");
@@ -36,10 +35,10 @@ export async function saveTodo(todos: { mytodo: string, isCompleted: boolean }, 
   }
     // collection(db, "collectionName")
     // addDoc("where", "what");
-    let collectionRef = collection(db, "Todos");
+    const collectionRef = collection(db, "Todos");
 
-    let uid = auth.currentUser?.uid;
-    let newTodo = { todos, uid }
+    const uid = auth.currentUser?.uid;
+    const newTodo = { todos, uid }
 
     await addDoc(collectionRef, newTodo);
     resetForm();
@@ -60,12 +59,12 @@ export async function FetchData() {
   // await getDocs(collectionRef)
   // if (auth.currentUser) {
 
-  let collectionRef = collection(db, "Todos");
-  let currentUseruid = auth.currentUser?.uid
+  const collectionRef = collection(db, "Todos");
+  const currentUseruid = auth.currentUser?.uid
 
-  let condition = where("uid", "==", currentUseruid)
-  let q = query(collectionRef, condition)
-  let allTodosSnapshot = await getDocs(q)
+  const condition = where("uid", "==", currentUseruid)
+  const q = query(collectionRef, condition)
+  const allTodosSnapshot = await getDocs(q)
 
 
   // method 1
@@ -77,8 +76,8 @@ export async function FetchData() {
   // })
 
   // method 2
-  let allTodos = allTodosSnapshot.docs.map((todoSnapshot) => {
-    let todoData = todoSnapshot.data();
+  const allTodos = allTodosSnapshot.docs.map((todoSnapshot) => {
+    const todoData = todoSnapshot.data();
     todoData.id = todoSnapshot.id;
     console.log('my',todoSnapshot.data());
     return todoData

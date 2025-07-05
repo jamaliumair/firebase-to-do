@@ -1,15 +1,13 @@
 import * as React from 'react';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import ForgotPassword from './ForgotPassword';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
+import { GoogleIcon, SitemarkIcon } from './CustomIcons';
 import AppTheme from '@/signIntheme/AppTheme';
 import ColorModeSelect from '@/signIntheme/ColorModeSelect';
 import { useRouter } from "next/navigation";
-import { useEffect } from 'react';
 import { signupWithEmailPassword, SinginWithGoogle } from '@/firebase/firebaseauth';
 import { AuthContextData } from '@/context/authcontext';
-import { Box, Button, Typography, FormLabel, TextField, FormControl, Link, CssBaseline, Checkbox, FormControlLabel, Stack, Container, Divider } from '@mui/material';
+import { Box, Button, Typography, FormLabel, TextField, FormControl, Link, CssBaseline, Stack, Divider } from '@mui/material';
 
 
 

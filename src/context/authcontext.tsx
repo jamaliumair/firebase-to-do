@@ -49,7 +49,6 @@ export default function AuthContextProvider({children} : {children: ReactNode}) 
                 if (loggedInUser.emailVerified) {
 
                     console.log(loggedInUser, "user sign in");
-                    const {email,uid} = loggedInUser;
                     route.push("/home");
                 } else {
                     route.push("/email-verify");

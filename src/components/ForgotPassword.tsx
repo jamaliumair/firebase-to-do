@@ -6,13 +6,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { auth, forgetPassword, verifyEmailFunc } from "@/firebase/firebaseauth";
-import { db } from "@/firebase/firebasefirestore";
-import { doc, updateDoc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { forgetPassword} from "@/firebase/firebaseauth";
+import {useState } from "react";
 import { AuthContextData } from '@/context/authcontext';
-import Typography from '@mui/material/Typography';
 
 interface ForgotPasswordProps {
   open: boolean;
@@ -21,7 +17,6 @@ interface ForgotPasswordProps {
 
 export default function ForgotPassword({ open, handleClose}: ForgotPasswordProps) {
   const {resetError, setResetError} = AuthContextData()!
-  const router  = useRouter();
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
   };

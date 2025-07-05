@@ -5,6 +5,7 @@ import { app } from "./firebaseconfig";
 import { db, saveUser } from "./firebasefirestore";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { DocumentReference } from 'firebase/firestore';
 
 
 export const auth = getAuth(app);
@@ -116,8 +117,8 @@ export const forgetPassword = (email: string, setError:(error: string) => void) 
     })
     .catch((error) => {
       setError("Error occured during the proccess");
-      const errorCode = error.code;
-      const errorMessage = error.message;
+      // const errorCode = error.code;
+      // const errorMessage = error.message;
       // ..
     });
 }
@@ -132,7 +133,7 @@ export const logoutFunc = (router: AppRouterInstance, setError:(error: string) =
   })
   .catch((error) => {
     setError("Error occured during the proccess");
-    console.log("error occured");
+    console.log("error occured => ", error.code);
   });
 }
 
@@ -142,12 +143,13 @@ export function SinginWithGoogle(router: AppRouterInstance, setError:(error: str
   signInWithPopup(auth, provider)
   .then((result) => {
     // This gives you a Google Access Token. You can use it to access the Google API.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
+    // const credential = GoogleAuthProvider.credentialFromResult(result);
+    // const token = credential?.accessToken;
     console.log(result)
     // The signed-in user info.
     const user = result.user;
-    let docRef = doc(db,'Users',user.uid)
+    console.log(user, "user signed in with google");
+    const docRef = doc(db,'Users',user.uid)
     checkingUserInDb(docRef, user)
     router.push("./home");
     // IdP data available using getAdditionalUserInfo(result)
@@ -155,25 +157,25 @@ export function SinginWithGoogle(router: AppRouterInstance, setError:(error: str
     setError("");
   }).catch((error) => {
     setError("Error occured during the proccess");
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
+    // // Handle Errors here.
+    // const errorCode = error.code;
+    // const errorMessage = error.message;
+    // // The email of the user's account used.
+    // const email = error.customData.email;
+    // // The AuthCredential type that was used.
+    // const credential = GoogleAuthProvider.credentialFromError(error);
+    // // ...
   });
 }
 
-async function checkingUserInDb(docRef: any, user: any) {
-  let currentUser = await getDoc(docRef);
+async function checkingUserInDb(docRef: DocumentReference, user: User) {
+  const currentUser = await getDoc(docRef);
   if(!currentUser.data()) {
    createUser(docRef,user);
   }
 }
 
-async function createUser(docRef: any, user:any) {
+async function createUser(docRef: DocumentReference, user:User) {
   await setDoc(docRef,{
     uid: user.uid,
     email: user.email,

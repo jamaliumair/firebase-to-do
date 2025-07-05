@@ -5,7 +5,7 @@ import { db, saveTodo } from "@/firebase/firebasefirestore"
 import { Box, Button, Typography, TextField, Checkbox, FormControlLabel, Card, CardContent, IconButton, Stack, Container, Skeleton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { onAuthStateChanged } from "firebase/auth"
-import { collection, deleteDoc, doc, DocumentData, getDoc, getDocs, onSnapshot, query, Unsubscribe, updateDoc, where } from "firebase/firestore"
+import { collection, deleteDoc, doc, DocumentData, getDoc, onSnapshot, query, Unsubscribe, updateDoc, where } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -30,7 +30,7 @@ export default function UserInfo() {
 
     useEffect(() => {
         //     fetchAllTodos()
-        let detachAuthListner = onAuthStateChanged(auth, (user) => {
+        const detachAuthListner = onAuthStateChanged(auth, (user) => {
             if (user) {
                 fetchData()
             } else {
@@ -56,7 +56,7 @@ export default function UserInfo() {
     let realTimeTodo: Unsubscribe;
 
     const fetchData = async () => {
-        let currentUseruid = auth.currentUser?.uid;
+        const currentUseruid = auth.currentUser?.uid;
 
         if (!currentUseruid) {
             console.error("User is not authenticated or UID is undefined.");
@@ -66,22 +66,21 @@ export default function UserInfo() {
 
             if (docSnap.exists()) {
                 console.log("Document data:", docSnap.data());
-                let { email, username } = docSnap.data()
+                const { email, username } = docSnap.data()
                 setUser({ email, username })
             } else {
                 // docSnap.data() will be undefined in this case
                 console.log("No such document!");
             }
         }
-        let collectionRef = collection(db, "Todos");
+        const collectionRef = collection(db, "Todos");
         // console.log(currentUseruid);
-        let condition = where("uid", "==", currentUseruid)
-        let q = query(collectionRef, condition)
-        let allTodosClone = [...allTodos]
+        const condition = where("uid", "==", currentUseruid)
+        const q = query(collectionRef, condition)
 
         realTimeTodo = onSnapshot(q, (querySnapshot) => {
 
-            let userTodo = querySnapshot.docs.map((todoDoc) => ({
+            const userTodo = querySnapshot.docs.map((todoDoc) => ({
                 ...todoDoc.data(),
                 id: todoDoc.id
 
@@ -126,7 +125,7 @@ export default function UserInfo() {
             return;
         }
 
-        const { id, todo, i } = editObj;
+        const { id, todo} = editObj;
         console.log("Updating todo:", id, todo, isCompleted);
         try {
             const docRef = doc(db, 'Todos', id);
@@ -153,7 +152,7 @@ export default function UserInfo() {
 
     const delData = async (id: string) => {
         try {
-            let docRef = doc(db, "Todos", id)
+            const docRef = doc(db, "Todos", id)
             await deleteDoc(docRef);
             console.log(id);
         } catch (error) {
