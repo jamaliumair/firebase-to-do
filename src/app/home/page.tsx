@@ -1,15 +1,13 @@
 "use client"
 import { AuthContextData } from "@/context/authcontext"
 import { auth, logoutFunc } from "@/firebase/firebaseauth"
-import { db, FetchData, saveTodo } from "@/firebase/firebasefirestore"
+import { db, saveTodo } from "@/firebase/firebasefirestore"
 import { Box, Button, Typography, TextField, Checkbox, FormControlLabel, Card, CardContent, IconButton, Stack, Container, Skeleton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { onAuthStateChanged } from "firebase/auth"
 import { collection, deleteDoc, doc, DocumentData, getDoc, getDocs, onSnapshot, query, Unsubscribe, updateDoc, where } from "firebase/firestore"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import ColorModeSelect from "@/signIntheme/ColorModeSelect";
 
 
 type todoType = {
