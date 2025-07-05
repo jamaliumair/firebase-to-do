@@ -5,14 +5,13 @@ import { app } from "./firebaseconfig";
 import { db, saveUser } from "./firebasefirestore";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { AuthContextData } from "@/context/authcontext";
 
 
 export const auth = getAuth(app);
-
+const provider = new GoogleAuthProvider();
 
 export function signupWithEmailPassword(username: string, email: string,
-   password: string, setError:(error: string) => void
+   password: string, setSignupError:(error: string) => void
   ) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -20,21 +19,43 @@ export function signupWithEmailPassword(username: string, email: string,
       const { email, uid, emailVerified } = userCredential.user;
       console.log(email, uid, username, 'user created successfully.');
       saveUser({ username, email: email as string, uid, emailVerified })
-      setError("");
+      setSignupError("");
       // ...
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error(errorMessage);
-      setError(errorMessage);
-      // ..
+       const errorCode = error.code;
+  let message = "";
+
+  switch (errorCode) {
+    case "auth/invalid-credential":
+      message = "The email address or password is not valid.";
+      break;
+    case "auth/user-not-found":
+      message = "No account found with this email.";
+      break;
+    case "auth/wrong-password":
+      message = "Incorrect password. Please try again.";
+      break;
+    case "auth/network-request-failed":
+      message = "Network error. Please check your internet connection.";
+      break;
+    case "auth/email-already-in-use":
+      message = "This email is already associated with an account.";
+    case "auth/too-many-requests":
+      message = "Too many failed attempts. Please try again later.";
+      break;
+    default:
+      message = "An unexpected error occurred. Please try again.";
+  }
+  
+  console.error(errorCode, error.message, message);
+  setSignupError(message);
     });
 }
 
 
 export function loginWithEmailPassword( email: string,
-   password: string,  setLoginError
+   password: string,  setLoginError: (error: string) => void
   ) {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -45,11 +66,32 @@ export function loginWithEmailPassword( email: string,
       // ...
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error(errorMessage);
-      setLoginError(errorMessage);
-    });
+  const errorCode = error.code;
+  let message = "";
+
+  switch (errorCode) {
+    case "auth/invalid-credential":
+      message = "The email address or password is not valid.";
+      break;
+    case "auth/user-not-found":
+      message = "No account found with this email.";
+      break;
+    case "auth/wrong-password":
+      message = "Incorrect password. Please try again.";
+      break;
+    case "auth/network-request-failed":
+      message = "Network error. Please check your internet connection.";
+      break;
+    case "auth/too-many-requests":
+      message = "Too many failed attempts. Please try again later.";
+      break;
+    default:
+      message = "An unexpected error occurred. Please try again.";
+  }
+
+  console.error(errorCode, error.message);
+  setLoginError(message);
+});
 }
 
 

@@ -217,10 +217,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                href="./signup"
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
-                onClick={() => { router.push("./signup") }}
+                // onClick={() => { router.push("./signup") }}
               >
                 Sign Up
               </Link>

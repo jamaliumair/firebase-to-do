@@ -28,8 +28,12 @@ export async function saveUser(User: UserType) {
 }
 
 
-export async function saveTodo(todos: { mytodo: string, isCompleted: boolean }) {
+export async function saveTodo(todos: { mytodo: string, isCompleted: boolean }, setError: (error: string) => void, resetForm: () => void) {
   try {
+  if (!todos.mytodo || todos.mytodo.trim() === "") {
+    setError("Todo cannot be empty");
+    return console.error("Todo cannot be empty");
+  }
     // collection(db, "collectionName")
     // addDoc("where", "what");
     let collectionRef = collection(db, "Todos");
@@ -38,8 +42,11 @@ export async function saveTodo(todos: { mytodo: string, isCompleted: boolean }) 
     let newTodo = { todos, uid }
 
     await addDoc(collectionRef, newTodo);
+    resetForm();
     console.log("new todo")
+    setError("");
   } catch (error) {
+    setError("Error saving todo");
     console.error("Error saving user:", error);
   }
 }

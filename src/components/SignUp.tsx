@@ -1,16 +1,4 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
@@ -21,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from 'react';
 import { signupWithEmailPassword, SinginWithGoogle } from '@/firebase/firebaseauth';
 import { AuthContextData } from '@/context/authcontext';
+import { Box, Button, Typography, FormLabel, TextField, FormControl, Link, CssBaseline, Checkbox, FormControlLabel, Stack, Container, Divider } from '@mui/material';
+
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -65,7 +55,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function SignUp(props: { disableCustomTheme?: boolean }) {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -73,12 +63,12 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
-  const {signupError, setSignupError} = AuthContextData()!;
-  const router  = useRouter();
+  const { signupError, setSignupError } = AuthContextData()!;
+  const router = useRouter();
 
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
+    event.preventDefault();
     if (nameError || emailError || passwordError) {
       return;
     }
@@ -127,19 +117,25 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     console.log(name.value)
 
     isValid &&
-        signupWithEmailPassword(name.value, email.value, password.value, setSignupError);
+      signupWithEmailPassword(name.value, email.value, password.value, setSignupError);
 
     return isValid;
   };
- 
+
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
+      <SignInContainer direction="column" justifyContent="space-between" 
+      sx={{ 
+  height: '100vh', 
+  overflowY: 'auto', 
+  py: 4,
+  minHeight: 'fit-content' 
+}}>
         <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
         <Card variant="outlined">
-           <SitemarkIcon />
+          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
@@ -148,7 +144,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             Sign Up
           </Typography>
           <Box
-          method="POST" 
+            method="POST"
             component="form"
             onSubmit={handleSubmit}
             noValidate
@@ -207,7 +203,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-        
+
             <Button
               type="submit"
               fullWidth
@@ -233,21 +229,19 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 href="/login"
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
-                onClick={() => {router.push("./login")}}
-              >
+                onClick={() => { router.push("./login") }}
+                >
                 Sign In
               </Link>
             </Typography>
-            {
-              signupError &&
-              <Typography
-                component="h1"
-                variant="h4"
-                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-              >
-                {signupError}
-              </Typography>
-            }
+                {signupError && (
+                  <Typography
+                    color="error"
+                    sx={{ textAlign: 'center', mt: 1 }}
+                  >
+                    {signupError}
+                  </Typography>
+                )}
           </Box>
         </Card>
       </SignInContainer>

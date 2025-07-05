@@ -1,16 +1,16 @@
 "use client";
 
 
-export default function Login() {
+export default function SignUpComponent() {
 
   return (
     <>
-    <App />
+    <SignUp />
     </>
   )
 }
 
 import * as React from 'react';
-import App from "@/components/SignUp";
+import SignUp from "@/components/SignUp";
 
 

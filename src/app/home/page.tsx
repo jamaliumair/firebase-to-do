@@ -2,34 +2,41 @@
 import { AuthContextData } from "@/context/authcontext"
 import { auth, logoutFunc } from "@/firebase/firebaseauth"
 import { db, FetchData, saveTodo } from "@/firebase/firebasefirestore"
+import { Box, Button, Typography, TextField, Checkbox, FormControlLabel, Card, CardContent, IconButton, Stack, Container, Skeleton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { onAuthStateChanged } from "firebase/auth"
 import { collection, deleteDoc, doc, DocumentData, getDoc, getDocs, onSnapshot, query, Unsubscribe, updateDoc, where } from "firebase/firestore"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import ColorModeSelect from "@/signIntheme/ColorModeSelect";
 
 
 type todoType = {
     id: string;
-    todo: string
+    todo: string,
+    i: number | null
 }
 
 
 export default function UserInfo() {
-     const router = useRouter();
+    const router = useRouter();
 
-    const { setUser, user, setError } = AuthContextData()!
+    const { setUser, user, setError, error } = AuthContextData()!
     const [mytodo, setMytodo] = useState("")
     const [editObj, setEditObj] = useState<null | todoType>(null)
     const [editTodo, setEditTodo] = useState(false)
     const [allTodos, setAllTodos] = useState<DocumentData[]>([]);
     const [isCompleted, setIsCompleted] = useState(false)
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         //     fetchAllTodos()
         let detachAuthListner = onAuthStateChanged(auth, (user) => {
             if (user) {
                 fetchData()
+            } else {
+                router.push("/signup")
             }
 
             return () => {
@@ -61,8 +68,8 @@ export default function UserInfo() {
 
             if (docSnap.exists()) {
                 console.log("Document data:", docSnap.data());
-                let {email, username} = docSnap.data()
-                 setUser({email, username})
+                let { email, username } = docSnap.data()
+                setUser({ email, username })
             } else {
                 // docSnap.data() will be undefined in this case
                 console.log("No such document!");
@@ -82,6 +89,7 @@ export default function UserInfo() {
 
             }))
             setAllTodos(userTodo);
+            setIsLoading(false);
             console.log(userTodo)
 
 
@@ -114,16 +122,30 @@ export default function UserInfo() {
     }
 
     const updateData = async (editObj: todoType | null, isCompleted: boolean) => {
-        const { id } = editObj
+        if (!editObj || !mytodo || mytodo.trim() === "") {
+            setError("Please select a valid todo to update.");
+            console.error("No valid todo selected for update.");
+            return;
+        }
+
+        const { id, todo, i } = editObj;
+        console.log("Updating todo:", id, todo, isCompleted);
         try {
             const docRef = doc(db, 'Todos', id);
             await updateDoc(docRef, {
                 todos: {
-                    todo: mytodo,
+                    mytodo: mytodo,
                     isCompleted
                 }
             });
-            setMytodo("");
+            // let updatedTodos = [...allTodos];
+            // updatedTodos.splice(i!, 1, {
+            //     id,
+            //     todos: { mytodo: todo, isCompleted }
+            // });
+            // setAllTodos(updatedTodos);
+            resetForm();
+            setError("");
             setEditTodo(false)
             console.log(mytodo, id)
         } catch (error) {
@@ -137,51 +159,137 @@ export default function UserInfo() {
             await deleteDoc(docRef);
             console.log(id);
         } catch (error) {
+            setError("Error deleting todo");
             console.log("error", error)
         }
     }
 
-    return (
-        <>
-            <h1>User Information </h1>
-            <Link href={"/signup"}>Sign</Link>
-            <h2>{user?.username}</h2>
-            <h2>{user?.email}</h2>
-            <label htmlFor="todo">Todo:
-                <input type="text" name="todo" value={mytodo} onChange={(e) => { setMytodo(e.target.value) }} />
-            </label><br />
-            <label htmlFor="todo">Todo Status:
-                <input type="checkbox" name="todo status" checked={isCompleted} onChange={() => { setIsCompleted(!isCompleted) }} />
-            </label><br />
-            {
-                editTodo ?
-                    <button onClick={
-                        () => updateData(editObj, isCompleted)
-                    }>Update</button> :
-                    <button onClick={() => {
-                        saveTodo({ mytodo, isCompleted })
-                    }
-                    }>Add</button>
-            }
+    const resetForm = () => {
+        setMytodo("");
+        setIsCompleted(false);
+    };
 
-            {
-                allTodos.length > 0 ?
-                    allTodos.map(({ id, todos }, i) => (
-                        <div>
-                            <h1 key={id}>{todos.todo}</h1>
-                            <p>Status: {todos.isCompleted ? "Completed" : "Incomplete"}</p>
-                            <button onClick={() => {
-                                setMytodo(todos.todo)
-                                setEditTodo(true)
-                                setEditObj({ id, todo: todos.todo })
-                            }}>Edit</button>
-                            <button onClick={() => delData(id)}>Delete</button>
-                        </div>
+
+    return (
+        <Container maxWidth="md" sx={{ py: 6 }}>
+
+            <Box mb={4} textAlign="center">
+                <Typography variant="h4" gutterBottom>User Information</Typography>
+                {
+                    user?.username ? (
+                        <>
+                            <Typography variant="h6">{user.username}</Typography>
+                            <Typography variant="subtitle1" color="text.secondary">{user.email}</Typography>
+                        </>
+                    ) : (
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexDirection="column"
+                            width="100%"
+                            height={80} // Optional: adds vertical space for better centering
+                        >
+                            <Skeleton variant="text" width={210} height={60} />
+                            <Skeleton variant="text" width={210} height={60} />
+                        </Box>
                     )
-                    ) :
-                    <p>No todos available</p>
-            }
-            <button onClick={() => logoutFunc(router, setError)}>Logout</button>
-        </>
+                }
+
+            </Box>
+
+            <Box mb={4}>
+                <Typography variant="h5" gutterBottom>Add / Edit Todo</Typography>
+                <TextField
+                    label="Todo"
+                    fullWidth
+                    size="small"
+                    value={mytodo}
+                    onChange={(e) => setMytodo(e.target.value)}
+                    sx={{ mb: 2 }}
+                />
+                <FormControlLabel
+                    control={<Checkbox checked={isCompleted} onChange={() => setIsCompleted(!isCompleted)} />}
+                    label="Mark as Completed"
+                />
+                <Box mt={2}>
+                    {editTodo ? (
+                        <Button variant="contained" onClick={() => updateData(editObj, isCompleted)}>Update</Button>
+                    ) : (
+                        <Button variant="contained" onClick={() => saveTodo({ mytodo, isCompleted }, setError, resetForm)}>Add</Button>
+                    )}
+                    {error && (
+                        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                            {error}
+                        </Typography>
+                    )}
+                </Box>
+            </Box>
+
+            <Box mb={4}>
+                <Typography variant="h5" gutterBottom>Your Todos</Typography>
+
+                {isLoading ? (
+                    <Stack spacing={2}>
+                        {[...Array(3)].map((_, index) => (
+                            <Card key={index} variant="outlined">
+                                <CardContent>
+                                    <Skeleton variant="text" width="60%" height={30} sx={{ mb: 1 }} />
+                                    <Skeleton variant="text" width="40%" height={20} sx={{ mb: 2 }} />
+                                    <Stack direction="row" spacing={1}>
+                                        <Skeleton variant="rectangular" width={60} height={30} />
+                                        <Skeleton variant="circular" width={30} height={30} />
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Stack>
+                ) : allTodos.length > 0 ? (
+                    <Stack spacing={2}>
+                        {allTodos.map(({ id, todos }, i) => (
+                            <Card key={id} variant="outlined">
+                                <CardContent>
+                                    <Typography variant="h6">{todos.mytodo}</Typography>
+                                    <Typography variant="body2" color={todos.isCompleted ? 'success.main' : 'warning.main'}>
+                                        Status: {todos.isCompleted ? 'Completed' : 'Incomplete'}
+                                    </Typography>
+                                    <Stack direction="row" spacing={1} mt={2}>
+                                        <Button
+                                            variant="outlined"
+                                            color="warning"
+                                            size="small"
+                                            onClick={() => {
+                                                setMytodo(todos.mytodo);
+                                                setEditTodo(true);
+                                                setEditObj({ id, todo: todos.mytodo, i });
+                                            }}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <IconButton
+                                            aria-label="delete"
+                                            size="small"
+                                            color="error"
+                                            onClick={() => delData(id)}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Stack>
+                ) : (
+                    <Typography color="text.secondary">No todos available</Typography>
+                )}
+            </Box>
+
+
+            <Box textAlign="center">
+                <Button variant="outlined" color="error" onClick={() => logoutFunc(router, setError)}>
+                    Logout
+                </Button>
+            </Box>
+        </Container>
     )
 }

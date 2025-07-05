@@ -5,12 +5,12 @@ export default function Login() {
 
   return (
     <>
-    <App />
+    <SignIn />
     </>
   )
 }
 
 import * as React from 'react';
-import App from "@/components/SignIn";
+import SignIn from "@/components/SignIn";
 
 

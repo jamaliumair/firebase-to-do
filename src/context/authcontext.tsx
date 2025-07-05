@@ -16,11 +16,13 @@ type AuthContextType = {
     signupError: string,
     resetError: string,
     logoutError: string,
+    error: string,
     setLogoutError: (logoutError: string) => void,
     setUser: (user: UserType) => void,
     setLoginError: (loginError: string) => void,
     setSignupError: (signupError: string) => void,
     setResetError: (resetError: string) => void,
+    setError: (error: string) => void,
     // setLoginError: (loginError: string) => void,
 
 }
@@ -36,6 +38,7 @@ export default function AuthContextProvider({children} : {children: ReactNode}) 
     const [signupError, setSignupError] = useState("");
     const [resetError, setResetError] = useState("");
     const [logoutError,setLogoutError] = useState("");
+    const [error,setError] = useState("");
 
     const route = useRouter()
 
@@ -57,15 +60,15 @@ export default function AuthContextProvider({children} : {children: ReactNode}) 
               
             //   console.log("user singed out");
             //   setUser(null);
-            //   route.push("/");
+            //   route.push("/login");
             // }
           });
-    }, [])
+    }, [user])
     
 
     return (
         <AuthContext.Provider value={{
-            user, setUser,loginError,signupError,resetError,
+            user, setUser,loginError,signupError,resetError, setError, error,
             setLoginError, setResetError, setSignupError,setLogoutError, logoutError
             }}>
             {children}
