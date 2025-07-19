@@ -10,30 +10,30 @@ import SendIcon from '@mui/icons-material/Send';
 
 export default function EmailVerify() {
   const router = useRouter()
-
-  const checkEmailVerification = async () => {
-    const user = auth.currentUser;
-    if (user) {
-      await user.reload(); // Reload user info to get updated email verification status
-      if (user.emailVerified) {
-        const docRef = doc(db, 'Users', user.uid);
-        await updateDoc(docRef, { emailVerified: true });
-        router.push("/home");
-        console.log("Your email has been verified!");
-      } else {
-        console.log("Email is not verified yet.");
-      }
-
-    }
-  };
-
+  
   // Listen for email verification status
   useEffect(() => {
+    
+      const checkEmailVerification = async () => {
+        const user = auth.currentUser;
+        if (user) {
+          await user.reload(); // Reload user info to get updated email verification status
+          if (user.emailVerified) {
+            const docRef = doc(db, 'Users', user.uid);
+            await updateDoc(docRef, { emailVerified: true });
+            router.push("/home");
+            console.log("Your email has been verified!");
+          } else {
+            console.log("Email is not verified yet.");
+          }
+    
+        }
+      };
     checkEmailVerification();
     const interval = setInterval(checkEmailVerification, 3000); // Check every 3 seconds
 
     return () => clearInterval(interval); // Cleanup the interval on unmount
-  }, []);
+  }, [router]);
 
 
 
