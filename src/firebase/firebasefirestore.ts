@@ -1,6 +1,6 @@
 "use client";
 
-import { addDoc, collection, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, getFirestore, query, setDoc, Timestamp, where } from "firebase/firestore";
 import { app } from "./firebaseconfig";
 import { auth } from "./firebaseauth";
 
@@ -27,7 +27,7 @@ export async function saveUser(User: UserType) {
 }
 
 
-export async function saveTodo(todos: { mytodo: string, isCompleted: boolean }, setError: (error: string) => void, resetForm: () => void) {
+export async function saveTodo(todos: { mytodo: string, isCompleted: boolean, createdAt: Timestamp }, setError: (error: string) => void, resetForm: () => void) {
   try {
   if (!todos.mytodo || todos.mytodo.trim() === "") {
     setError("Todo cannot be empty");
