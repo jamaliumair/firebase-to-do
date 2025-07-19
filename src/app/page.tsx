@@ -24,9 +24,9 @@ export default function Home() {
     </Button>
       </Link>
 
-       <Link href={"/signup"}>
+       <Link href={"/login"}>
     <Button variant="contained" size="medium">
-      SignUp
+      Sign In
     </Button>
       </Link>
   </div>
